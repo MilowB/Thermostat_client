@@ -9,5 +9,38 @@
     We are using node <script>document.write(process.versions.node)</script>,
     Chrome <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
+
+    <h1>The XMLHttpRequest Object</h1>
+
+    <button type="button" onclick="loadDoc()">Request data</button>
+
+    <p id="request"></p>
+
+    <script>
+      function loadDoc() {
+        key = readTextFile("config.txt");
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          document.getElementById("request").innerHTML = this.responseText;
+        };
+        xhttp.open("GET", "http://localhost:5000/data/temperature/" + key, true);
+        xhttp.send();
+      }
+
+      function readTextFile(file) {
+        var allText = "";
+        var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", file, false);
+        rawFile.onreadystatechange = function () {
+            if(rawFile.readyState === 4) {
+                if(rawFile.status === 200 || rawFile.status == 0) {
+                    allText = rawFile.responseText;
+                }
+            }
+        }
+        rawFile.send(null);
+        return allText;
+      }
+      </script>
   </body>
 </html>
