@@ -1,9 +1,96 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://code.jquery.com/jquery-2.x-git.min.js" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
+
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>
+<style>
+      /*icon styles*/
+      .fi-social-facebook {
+        color: dodgerblue;
+        font-size: 2rem;
+      }
+      .fi-social-youtube {
+        color: red;
+        font-size: 2rem;
+      }
+      .fi-social-pinterest {
+        color: darkred;
+        font-size: 2rem;
+      }
+      i.fi-social-instagram {
+        color: brown;
+        font-size: 2rem;
+      }
+      i.fi-social-tumblr {
+        color: navy;
+        font-size: 2rem;
+      }
+      .fi-social-twitter {
+        color: skyblue;
+        font-size: 2rem;
+      }
+    
+    </style>
+
+<div class="row column">
+<h4 style="margin: 0;" class="text-center" id="request"> </h4>
+</div>
+
+<button type="button" onclick="testServeur()">Test Serveur</button>
+
+</footer>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+<script>
+      $(document).foundation();
+    </script>
+</body>
+</html>
+
+<script>
+  function testServeur() {
+    key = readTextFile("config.txt");
+    $.ajax({
+        type: 'GET',
+        url: "http://localhost:5000/data/temperature/" + key,
+        success: function(data){
+            document.getElementById("request").innerHTML = JSON.stringify(data["temperature"]);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("request").innerHTML = "Serveur indisponible";
+            }
+            //alert(jqXHR.status);
+            //alert(textStatus);
+            //alert(errorThrown);
+        }
+    });
+  }
+
+  function readTextFile(file) {
+    var allText = "";
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function () {
+        if(rawFile.readyState === 4) {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+                allText = rawFile.responseText;
+            }
+        }
+    }
+    rawFile.send(null);
+    return allText;
+  }
+</script>
+
+<!--
   <body>
     <h1>Hello World!</h1>
     We are using node <script>document.write(process.versions.node)</script>,
@@ -15,7 +102,20 @@
     <button type="button" onclick="loadDoc()">Request data</button>
 
     <p id="request"></p>
-
+    <script>
+            // Feel free to change or delete any of the code you see in this editor!
+            var svg = d3.select("body").append("svg")
+              .attr("width", 960)
+              .attr("height", 500)
+        
+            svg.append("text")
+              .text("Edit the code below to change me!")
+              .attr("y", 200)
+              .attr("x", 120)
+              .attr("font-size", 36)
+              .attr("font-family", "monospace")
+        
+          </script>
     <script>
       function loadDoc() {
         key = readTextFile("config.txt");
@@ -43,4 +143,5 @@
       }
       </script>
   </body>
-</html>
+    </html>
+-->
