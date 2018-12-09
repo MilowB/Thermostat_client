@@ -10,47 +10,37 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>
-<style>
-      /*icon styles*/
-      .fi-social-facebook {
-        color: dodgerblue;
-        font-size: 2rem;
-      }
-      .fi-social-youtube {
-        color: red;
-        font-size: 2rem;
-      }
-      .fi-social-pinterest {
-        color: darkred;
-        font-size: 2rem;
-      }
-      i.fi-social-instagram {
-        color: brown;
-        font-size: 2rem;
-      }
-      i.fi-social-tumblr {
-        color: navy;
-        font-size: 2rem;
-      }
-      .fi-social-twitter {
-        color: skyblue;
-        font-size: 2rem;
-      }
-    
-    </style>
 
 <div class="row column">
 <h4 style="margin: 0;" class="text-center" id="request"> </h4>
 </div>
+<body style="background-color: orange;">
+    <div class="columns large-12">
+        <button type="button" onclick="testServeur()">Test Serveur</button>
+    </div>
 
-<button type="button" onclick="testServeur()">Test Serveur</button>
+    <div class="columns large-12">
+        <div class="columns large-3" style="background-color: purple;">
+            <a href="index.html">Temperature</a>
+        </div>
+        <div class="columns large-3" style="background-color: blue;">
+            <p>History</p>
+        </div>
+        <div class="columns large-3" style="background-color: red;">
+            <a href="schedule.html">Planning</a>
+        </div>
+        <div class="columns large-3" style="background-color: green;">
+            <p>Power</p>
+        </div>
+    </div>
+
 
 </footer>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
 <script>
       $(document).foundation();
-    </script>
+	</script>
 </body>
 </html>
 
@@ -61,7 +51,11 @@
         type: 'GET',
         url: "http://localhost:5000/data/temperature/" + key,
         success: function(data){
-            document.getElementById("request").innerHTML = JSON.stringify(data["temperature"]);
+            data = JSON.parse(data);
+            if(data["status"] == "success")
+              document.getElementById("request").innerHTML = data["temperature"];
+            else
+              document.getElementById("request").innerHTML = data["description"];
         },
         error: function(jqXHR, textStatus, errorThrown) {
             if(jqXHR.status == 0){
