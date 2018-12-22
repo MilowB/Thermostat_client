@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <head>
+    <script src="https://code.jquery.com/jquery-2.x-git.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
     <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
 </head>
@@ -33,6 +36,7 @@
     <option value="samedi">samedi</option>
     <option value="dimanche">dimanche</option>
 </select>
+<div id="getPlanning"></div>
 
 <script>
 
@@ -46,7 +50,13 @@ var points = d3.range(0, 10).map(function(i) {
 });
 
 points = readRule();
-updateGraph(points);
+
+ping(function(){
+    getRules(function(){
+        updateGraph(points);
+    });
+})
+
 
 d3.select('#inds')
     .on("change", function(){ 
@@ -146,6 +156,7 @@ function buildRule(d) {
         rule.data.push({temperature : d[p][1], hour : d[p][0]});
     }
     data[currentDay] = rule;
+    sendRules(data);
     var fs = require('fs');
     fs.writeFile('rules.json', JSON.stringify(data), 'utf8', function(){});
 }
@@ -167,7 +178,6 @@ function readRule() {
 }
 
 function updateGraph(loadedPoints){
-
     x = d3.scaleLinear()
     .rangeRound([0, width]);
 
@@ -218,6 +228,72 @@ function readTextFile(file)
     }
     rawFile.send(null);
     return allText;
+}
+
+function sendRules(json) {
+    key = readTextFile("config.txt");
+    $.ajax({
+        type: 'PUT',
+        url: "http://localhost:5000/manage/planning/" + key,
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({"rules": json}),
+        success: function(data){
+            data = JSON.parse(data);
+            if(data["status"] != "success")
+                document.getElementById("getPlanning").innerHTML = data["description"];
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("getPlanning").innerHTML = "Serveur indisponible";
+            }
+        }
+    });
+}
+
+function getRules(callback) {
+    key = readTextFile("config.txt");
+    $.ajax({
+        type: 'GET',
+        url: "http://localhost:5000/data/planning/" + key,
+        success: function(data){
+            data = JSON.parse(data);
+            if(data["status"] == "success"){
+                var fs = require('fs');
+                myjson = JSON.stringify(data["data"]);
+                tostr = myjson.replace(new RegExp("\"", 'g'), "");
+                tostr = tostr.replace(new RegExp("'", 'g'), "\"");
+                fs.writeFile('rules.json', tostr, 'utf8', function(){});
+                callback();
+            }
+            else
+                document.getElementById("getPlanning").innerHTML = data["description"];
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("getPlanning").innerHTML = "Serveur indisponible";
+            }
+        }
+    });
+}
+
+function ping(callback) {
+    key = readTextFile("config.txt");
+    $.ajax({
+        type: 'GET',
+        url: "http://localhost:5000/testPing",
+        success: function(data){
+            data = JSON.parse(data);
+            if(data["status"] == "success"){
+                callback();
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("getPlanning").innerHTML = "Serveur indisponible";
+            }
+        }
+    });
 }
 
 </script>
