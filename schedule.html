@@ -234,7 +234,7 @@ function sendRules(json) {
     key = readTextFile("config.txt");
     $.ajax({
         type: 'PUT',
-        url: "http://localhost:5000/manage/planning/" + key,
+        url: "http://192.168.0.18:5000/manage/planning/" + key,
         dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify({"rules": json}),
@@ -255,7 +255,7 @@ function getRules(callback) {
     key = readTextFile("config.txt");
     $.ajax({
         type: 'GET',
-        url: "http://localhost:5000/data/planning/" + key,
+        url: "http://192.168.0.18:5000/data/planning/" + key,
         success: function(data){
             data = JSON.parse(data);
             if(data["status"] == "success"){
@@ -281,7 +281,7 @@ function ping(callback) {
     key = readTextFile("config.txt");
     $.ajax({
         type: 'GET',
-        url: "http://localhost:5000/testPing",
+        url: "http://192.168.0.18:5000/testPing",
         success: function(data){
             data = JSON.parse(data);
             if(data["status"] == "success"){
