@@ -30,7 +30,7 @@
             <a href="schedule.html">Planning</a>
         </div>
         <div class="columns large-3" style="background-color: green;">
-            <p>Power</p>
+            <button type="button" onclick="setWorking()" id="power_button" >Power</button>
         </div>
     </div>
 
@@ -45,28 +45,58 @@
 </html>
 
 <script>
-  function testServeur() {
-    key = readTextFile("config.txt");
-    $.ajax({
-        type: 'GET',
-        url: "http://192.168.0.18:5000/data/temperature/" + key,
-        success: function(data){
-            data = JSON.parse(data);
-            if(data["status"] == "success")
-              document.getElementById("request").innerHTML = data["temperature"];
-            else
-              document.getElementById("request").innerHTML = data["description"];
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            if(jqXHR.status == 0){
-                document.getElementById("request").innerHTML = "Serveur indisponible";
-            }
-            //alert(jqXHR.status);
-            //alert(textStatus);
-            //alert(errorThrown);
+    function setWorking() {
+        // If the thermostat is currently working, the button have to stop it
+        var work = true;
+        if(document.getElementById("power_button").innerHTML == "Power ON"){
+            work = false;
         }
-    });
-  }
+        key = readTextFile("config.txt");
+        $.ajax({
+            type: 'PUT',
+            url: "http://192.168.0.18:5000/manage/thermostat/" + key,
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({"working": work}),
+            success: function(data){
+                data = JSON.parse(data);
+                if(data["status"] != "success"){
+                    if(work)
+                        document.getElementById("power_button").innerHTML = "Power ON";
+                    else
+                        document.getElementById("power_button").innerHTML = "Power OFF";
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if(jqXHR.status == 0){
+                    document.getElementById("power_button").innerHTML = "Serveur indisponible";
+                }
+            }
+        });
+    }
+
+    function testServeur() {
+        key = readTextFile("config.txt");
+        $.ajax({
+            type: 'GET',
+            url: "http://192.168.0.18:5000/data/temperature/" + key,
+            success: function(data){
+                data = JSON.parse(data);
+                if(data["status"] == "success")
+                    document.getElementById("request").innerHTML = data["temperature"];
+                else
+                    document.getElementById("request").innerHTML = data["description"];
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if(jqXHR.status == 0){
+                    document.getElementById("request").innerHTML = "Serveur indisponible";
+                }
+                //alert(jqXHR.status);
+                //alert(textStatus);
+                //alert(errorThrown);
+            }
+        });
+    }
 
   function readTextFile(file) {
     var allText = "";
