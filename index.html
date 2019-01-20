@@ -45,13 +45,16 @@
 </html>
 
 <script>
+    getWorking();
+
     function setWorking() {
         // If the thermostat is currently working, the button have to stop it
         var work = true;
-        if(document.getElementById("power_button").innerHTML == "Power ON"){
+        if(document.getElementById("power_button").innerHTML == "True"){
             work = false;
         }
         key = readTextFile("config.txt");
+        console.log("Envoie " + work);
         $.ajax({
             type: 'PUT',
             url: "http://192.168.0.18:5000/manage/thermostat/" + key,
@@ -60,17 +63,41 @@
             data: JSON.stringify({"working": work}),
             success: function(data){
                 data = JSON.parse(data);
-                if(data["status"] != "success"){
+                if(data["status"] == "success"){
                     if(work)
-                        document.getElementById("power_button").innerHTML = "Power ON";
+                        document.getElementById("power_button").innerHTML = "True";
                     else
-                        document.getElementById("power_button").innerHTML = "Power OFF";
+                        document.getElementById("power_button").innerHTML = "False";
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 if(jqXHR.status == 0){
                     document.getElementById("power_button").innerHTML = "Serveur indisponible";
                 }
+            }
+        });
+    }
+
+    function getWorking() {
+        key = readTextFile("config.txt");
+        $.ajax({
+            type: 'GET',
+            url: "http://192.168.0.18:5000/state/thermostat/" + key,
+            success: function(data){
+                console.log(data);
+                data = JSON.parse(data);
+                if(data["status"] == "success")
+                    document.getElementById("power_button").innerHTML = data["working"];
+                else
+                    document.getElementById("power_button").innerHTML = data["working"];
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if(jqXHR.status == 0){
+                    document.getElementById("power_button").innerHTML = "Serveur indisponible";
+                }
+                //alert(jqXHR.status);
+                //alert(textStatus);
+                //alert(errorThrown);
             }
         });
     }
