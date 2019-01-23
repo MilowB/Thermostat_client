@@ -45,6 +45,9 @@
 </html>
 
 <script>
+    file = readTextFile("config.txt");
+    var address = file.split("\n")[1].split(" ")[1];
+    var key = file.split("\n")[0].split(" ")[1];
     getWorking();
 
     function setWorking() {
@@ -53,11 +56,10 @@
         if(document.getElementById("power_button").innerHTML == "True"){
             work = false;
         }
-        key = readTextFile("config.txt");
         console.log("Envoie " + work);
         $.ajax({
             type: 'PUT',
-            url: "http://192.168.0.18:5000/manage/thermostat/" + key,
+            url: "http://" + address + ":5000/manage/thermostat/" + key,
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify({"working": work}),
@@ -79,10 +81,9 @@
     }
 
     function getWorking() {
-        key = readTextFile("config.txt");
         $.ajax({
             type: 'GET',
-            url: "http://192.168.0.18:5000/state/thermostat/" + key,
+            url: "http://" + address + ":5000/state/thermostat/" + key,
             success: function(data){
                 console.log(data);
                 data = JSON.parse(data);
@@ -103,10 +104,12 @@
     }
 
     function testServeur() {
-        key = readTextFile("config.txt");
+        file = readTextFile("config.txt");
+        key = file.split("\n")[0].split(" ")[1];
+        console.log("http://" + address + ":5000/data/temperature/" + key);
         $.ajax({
             type: 'GET',
-            url: "http://192.168.0.18:5000/data/temperature/" + key,
+            url: "http://" + address + ":5000/data/temperature/" + key,
             success: function(data){
                 data = JSON.parse(data);
                 if(data["status"] == "success")

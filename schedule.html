@@ -40,6 +40,10 @@
 
 <script>
 
+file = readTextFile("config.txt");
+var address = file.split("\n")[1].split(" ")[1];
+var api_key = file.split("\n")[0].split(" ")[1];
+
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
@@ -130,6 +134,11 @@ focus.append('g')
 
 function dragstarted(d) {
     d3.select(this).raise().classed('active', true);
+    var coordinates= d3.mouse(this);
+    var x = coordinates[0];
+    var y = coordinates[1];
+    console.log(x + ", " + y);
+
 }
 
 function dragged(d) {
@@ -231,10 +240,9 @@ function readTextFile(file)
 }
 
 function sendRules(json) {
-    key = readTextFile("config.txt");
     $.ajax({
         type: 'PUT',
-        url: "http://192.168.0.18:5000/manage/planning/" + key,
+        url: "http://" + address + ":5000/manage/planning/" + api_key,
         dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify({"rules": json}),
@@ -252,10 +260,10 @@ function sendRules(json) {
 }
 
 function getRules(callback) {
-    key = readTextFile("config.txt");
+    console.log(key)
     $.ajax({
         type: 'GET',
-        url: "http://192.168.0.18:5000/data/planning/" + key,
+        url: "http://" + address + ":5000/data/planning/" + api_key,
         success: function(data){
             data = JSON.parse(data);
             if(data["status"] == "success"){
@@ -278,10 +286,9 @@ function getRules(callback) {
 }
 
 function ping(callback) {
-    key = readTextFile("config.txt");
     $.ajax({
         type: 'GET',
-        url: "http://192.168.0.18:5000/testPing",
+        url: "http://" + address + ":5000/testPing",
         success: function(data){
             data = JSON.parse(data);
             if(data["status"] == "success"){
