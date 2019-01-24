@@ -10,7 +10,7 @@
 <!-- Thanks to Mark - https://stackoverflow.com/users/16363/mark -->
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <div class="columns large-12">
-    <svg width="500" height="350"></svg>
+    <svg width="1000" height="700"></svg>
     <div class="columns large-12">
         <div class="columns large-3" style="background-color: purple;">
             <a href="index.html">Temperature</a>
@@ -62,6 +62,8 @@ ping(function(){
 })
 
 
+svg.on("mousemove", updateLines);
+
 d3.select('#inds')
     .on("change", function(){ 
         points = readRule();
@@ -69,6 +71,7 @@ d3.select('#inds')
     });
 
 var x = d3.scaleLinear()
+    .domain(d3.extent(0, width))
     .rangeRound([0, width]);
 
 var y = d3.scaleLinear()
@@ -88,7 +91,6 @@ let drag = d3.drag()
         
 svg.append('rect')
     .attr('class', 'zoom')
-    .attr('cursor', 'move')
     .attr('fill', 'none')
     .attr('pointer-events', 'all')
     .attr('width', width)
@@ -100,6 +102,46 @@ svg.append('rect')
 
 x.domain(d3.extent(points, function(d) { return d[0]; }));
 y.domain([0, 30]);
+
+var xline = focus.append("line")
+    .attr("x1", 0)
+    .attr("x2", 0)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", "gray");
+
+var yline = focus.append("line")
+    .attr("x1", 0)
+    .attr("x2", 0)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", "gray");
+
+function updateLines(){
+    var m = d3.mouse(this);
+    xline.transition()
+        .duration(0)
+        .attr("x1", m[0] - margin.left)
+        .attr("x2", m[0] - margin.left)
+        .attr("y1", m[1]  - margin.top)
+        .attr("y2", height)
+        .attr("stroke", "gray");
+    yline.transition()
+        .duration(0)
+        .attr("x1", m[0] - margin.left)
+        .attr("x2", 0)
+        .attr("y1", m[1] - margin.top)
+        .attr("y2", m[1] - margin.top)
+        .attr("stroke", "gray");
+}
+/*
+    focus.append('circle')
+    .attr('r', 7.5)
+    .attr('cx', m[0])
+    .attr('cy', m[1])
+    .style('cursor', 'pointer')
+    .style('fill', 'steelblue');
+    */
 
 focus.append("path")
     .datum(points)
@@ -114,7 +156,7 @@ focus.selectAll('circle')
     .data(points)
     .enter()
     .append('circle')
-    .attr('r', 5.0)
+    .attr('r', 7.5)
     .attr('cx', function(d) { return x(d[0]);  })
     .attr('cy', function(d) { return y(d[1]); })
     .style('cursor', 'pointer')
@@ -132,13 +174,13 @@ focus.append('g')
     .attr('class', 'axis axis--y')
     .call(yAxis);
 
+
 function dragstarted(d) {
+    //updateLines();
     d3.select(this).raise().classed('active', true);
     var coordinates= d3.mouse(this);
     var x = coordinates[0];
     var y = coordinates[1];
-    console.log(x + ", " + y);
-
 }
 
 function dragged(d) {
@@ -162,12 +204,20 @@ function buildRule(d) {
     var rule = {};
     rule.data = [];
     for(p in d){
-        rule.data.push({temperature : d[p][1], hour : d[p][0]});
+        // On the chart, hours are between [0, 1] and we need to rescale them between [0, 0.6]
+        rule.data.push({temperature : d[p][1], hour : rescale(d[p][0], 0.6)});
     }
     data[currentDay] = rule;
     sendRules(data);
     var fs = require('fs');
     fs.writeFile('rules.json', JSON.stringify(data), 'utf8', function(){});
+}
+
+//Rescale reals [0, 1] between [0, 0.6]
+function rescale(value, max_output){
+    troncValue = parseInt(value);
+    var res = (value - troncValue) * max_output
+    return troncValue + res;
 }
 
 function readRule() {
@@ -188,19 +238,19 @@ function readRule() {
 
 function updateGraph(loadedPoints){
     x = d3.scaleLinear()
+    .domain(d3.extent(points, function(d) { return d[0]; }))
     .rangeRound([0, width]);
 
     y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-    x.domain(d3.extent(points, function(d) { return d[0]; }));
     y.domain([0, 30]);
 
     var state = svg.selectAll("circle")
         .data(loadedPoints);
 
     state.transition()
-        .attr('r', 5.0)
+        .attr('r', 7.5)
         .attr('cx', function(d) { return x(d[0]); })
         .attr('cy', function(d) { return y(d[1]); })
         .style('cursor', 'pointer')
