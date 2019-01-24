@@ -1,1 +1,14 @@
-npm start
+What is it ?
+------------
+
+It is the client side of a heating system management (Server side is on the repository Thermostat_server). It is useful to schedule the temperature of your home hour by hour or just to see the current temperature.
+
+How to run it ?
+---------------
+
+npm install && npm start
+
+Why there are errors everywhere ?
+---------------------------------
+
+Did you think to launch the server ? :)
