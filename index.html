@@ -12,7 +12,11 @@
   </head>
 
 <div class="row column">
-<h4 style="margin: 0;" class="text-center" id="request"> </h4>
+
+<h4 style="margin: 0;" class="text-center" id="request"></h4>
+<img id="up_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/up.svg" alt="augmentation de la température"/>
+<img id="down_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/down.svg" alt="diminution de la température"/>
+
 </div>
 <body style="background-color: #C2C2C2;">
     <div class="columns large-12">
@@ -45,7 +49,8 @@
 </html>
 
 <script>
-    file = readTextFile("config.txt");
+    var lastTemperature = null;
+    var file = readTextFile("config.txt");
     var address = file.split("\n")[1].split(" ")[1];
     var key = file.split("\n")[0].split(" ")[1];
     getWorking();
@@ -111,8 +116,24 @@
             url: "http://" + address + ":5000/data/temperature/" + key,
             success: function(data){
                 data = JSON.parse(data);
-                if(data["status"] == "success")
-                    document.getElementById("request").innerHTML = data["temperature"];
+                if(data["status"] == "success"){
+                    var toPrint = "";
+                    
+                    toPrint = data["temperature"] + "°C";
+                    if(lastTemperature != null){
+                        if(lastTemperature > data["temperature"]){
+                            document.getElementById("up_svg").style.display = "none";
+                            document.getElementById("down_svg").style.display = "block";
+                        }
+                        else if(lastTemperature < data["temperature"]){
+                            document.getElementById("up_svg").style.display = "block";
+                            document.getElementById("down_svg").style.display = "none";
+                        }
+                        else{}
+                    }
+                    document.getElementById("request").innerHTML = toPrint;
+                    lastTemperature = data["temperature"];
+                }
                 else
                     document.getElementById("request").innerHTML = data["description"];
             },
