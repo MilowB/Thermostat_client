@@ -6,43 +6,46 @@
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
     <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
 </head>
-<!-- https://stackoverflow.com/questions/42720488/d3-v4-drag-line-chart-with-x-and-y-axes -->
-<!-- Thanks to Mark - https://stackoverflow.com/users/16363/mark -->
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<div class="columns large-12">
+<body style="background-color: #C2C2C2;"></body>
+    <!-- https://stackoverflow.com/questions/42720488/d3-v4-drag-line-chart-with-x-and-y-axes -->
+    <!-- Thanks to Mark - https://stackoverflow.com/users/16363/mark -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
     <svg width="1000" height="700"></svg>
+
+    <select id="inds">
+        <option value="lundi" selected="selected">lundi</option>
+        <option value="mardi">mardi</option>
+        <option value="mercredi">mercredi</option>
+        <option value="jeudi">jeudi</option>
+        <option value="vendredi">vendredi</option>
+        <option value="samedi">samedi</option>
+        <option value="dimanche">dimanche</option>
+    </select>
+    <div id="getPlanning"></div>
+
     <div class="columns large-12">
-        <div class="columns large-3" style="background-color: purple;">
+        <div class="columns large-3" style="background-color: #2C2C2C;">
             <a href="index.html">Temperature</a>
         </div>
-        <div class="columns large-3" style="background-color: blue;">
-            <p>History</p>
+        <div class="columns large-3" style="background-color: #2C2C2C;">
+            <a href="historic.html">Historique</a>
         </div>
-        <div class="columns large-3" style="background-color: red;">
+        <div class="columns large-3" style="background-color: #2C2C2C;">
             <a href="schedule.html">Planning</a>
         </div>
-        <div class="columns large-3" style="background-color: green;">
-            <p>Power</p>
+        <div class="columns large-3" style="background-color: #2C2C2C;">
+            <a onclick="setWorking()" id="power_button" >Power</a>
         </div>
     </div>
-</div>
-
-<select id="inds">
-    <option value="lundi" selected="selected">lundi</option>
-    <option value="mardi">mardi</option>
-    <option value="mercredi">mercredi</option>
-    <option value="jeudi">jeudi</option>
-    <option value="vendredi">vendredi</option>
-    <option value="samedi">samedi</option>
-    <option value="dimanche">dimanche</option>
-</select>
-<div id="getPlanning"></div>
+</body>
 
 <script>
 
 file = readTextFile("config.txt");
 var address = file.split("\n")[1].split(" ")[1];
 var api_key = file.split("\n")[0].split(" ")[1];
+getWorking();
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -108,14 +111,14 @@ var xline = focus.append("line")
     .attr("x2", 0)
     .attr("y1", 0)
     .attr("y2", 0)
-    .attr("stroke", "gray");
+    .attr("stroke", "black");
 
 var yline = focus.append("line")
     .attr("x1", 0)
     .attr("x2", 0)
     .attr("y1", 0)
     .attr("y2", 0)
-    .attr("stroke", "gray");
+    .attr("stroke", "black");
 
 function updateLines(){
     var m = d3.mouse(this);
@@ -125,14 +128,12 @@ function updateLines(){
         .attr("x2", m[0] - margin.left)
         .attr("y1", m[1]  - margin.top)
         .attr("y2", height)
-        .attr("stroke", "gray");
     yline.transition()
         .duration(0)
         .attr("x1", m[0] - margin.left)
         .attr("x2", 0)
         .attr("y1", m[1] - margin.top)
         .attr("y2", m[1] - margin.top)
-        .attr("stroke", "gray");
 }
 /*
     focus.append('circle')
@@ -176,11 +177,22 @@ focus.append('g')
 
 
 function dragstarted(d) {
-    //updateLines();
     d3.select(this).raise().classed('active', true);
     var coordinates= d3.mouse(this);
     var x = coordinates[0];
     var y = coordinates[1];
+    xline.transition()
+        .duration(0)
+        .attr("x1", coordinates[0] )
+        .attr("x2", coordinates[0] )
+        .attr("y1", coordinates[1] )
+        .attr("y2", height);
+    yline.transition()
+        .duration(0)
+        .attr("x1", coordinates[0])
+        .attr("x2", 0)
+        .attr("y1", coordinates[1])
+        .attr("y2", coordinates[1]);
 }
 
 function dragged(d) {
@@ -190,6 +202,19 @@ function dragged(d) {
         .attr('cx', x(d[0]))
         .attr('cy', y(d[1]))
     focus.select('path').attr('d', line);
+    var coordinates= d3.mouse(this);
+    xline.transition()
+        .duration(0)
+        .attr("x1", coordinates[0] )
+        .attr("x2", coordinates[0] )
+        .attr("y1", coordinates[1] )
+        .attr("y2", height);
+    yline.transition()
+        .duration(0)
+        .attr("x1", coordinates[0])
+        .attr("x2", 0)
+        .attr("y1", coordinates[1])
+        .attr("y2", coordinates[1]);
 }
 
 function dragended(d) {
@@ -353,4 +378,56 @@ function ping(callback) {
     });
 }
 
+function setWorking() {
+    // If the thermostat is currently working, the button have to stop it
+    var work = true;
+    if(document.getElementById("power_button").innerHTML == "True"){
+        work = false;
+    }
+    console.log("Envoie " + work);
+    $.ajax({
+        type: 'PUT',
+        url: "http://" + address + ":5000/manage/thermostat/" + api_key,
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({"working": work}),
+        success: function(data){
+            data = JSON.parse(data);
+            if(data["status"] == "success"){
+                if(work)
+                    document.getElementById("power_button").innerHTML = "True";
+                else
+                    document.getElementById("power_button").innerHTML = "False";
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("power_button").innerHTML = "Serveur indisponible";
+            }
+        }
+    });
+}
+
+function getWorking() {
+    $.ajax({
+        type: 'GET',
+        url: "http://" + address + ":5000/state/thermostat/" + api_key,
+        success: function(data){
+            console.log(data);
+            data = JSON.parse(data);
+            if(data["status"] == "success")
+                document.getElementById("power_button").innerHTML = data["working"];
+            else
+                document.getElementById("power_button").innerHTML = data["working"];
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status == 0){
+                document.getElementById("power_button").innerHTML = "Serveur indisponible";
+            }
+            //alert(jqXHR.status);
+            //alert(textStatus);
+            //alert(errorThrown);
+        }
+    });
+}
 </script>

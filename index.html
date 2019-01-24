@@ -14,23 +14,23 @@
 <div class="row column">
 <h4 style="margin: 0;" class="text-center" id="request"> </h4>
 </div>
-<body style="background-color: orange;">
+<body style="background-color: #C2C2C2;">
     <div class="columns large-12">
-        <button type="button" onclick="testServeur()">Test Serveur</button>
+        <button type="button" class="button large" onclick="updateTemperature()">Mettre à jour la température</button>
     </div>
 
     <div class="columns large-12">
-        <div class="columns large-3" style="background-color: purple;">
+        <div class="columns large-3" style="background-color: #2C2C2C;">
             <a href="index.html">Temperature</a>
         </div>
-        <div class="columns large-3" style="background-color: blue;">
-            <p>History</p>
+        <div class="columns large-3" style="background-color: #2C2C2C;">
+            <a href="historic.html">Historique</a>
         </div>
-        <div class="columns large-3" style="background-color: red;">
+        <div class="columns large-3" style="background-color: #2C2C2C;">
             <a href="schedule.html">Planning</a>
         </div>
-        <div class="columns large-3" style="background-color: green;">
-            <button type="button" onclick="setWorking()" id="power_button" >Power</button>
+        <div class="columns large-3" style="background-color: #2C2C2C;">
+            <a onclick="setWorking()" id="power_button" >Power</a>
         </div>
     </div>
 
@@ -49,6 +49,8 @@
     var address = file.split("\n")[1].split(" ")[1];
     var key = file.split("\n")[0].split(" ")[1];
     getWorking();
+    updateTemperature();
+    setInterval(function(){ updateTemperature(); }, 60000);
 
     function setWorking() {
         // If the thermostat is currently working, the button have to stop it
@@ -103,10 +105,7 @@
         });
     }
 
-    function testServeur() {
-        file = readTextFile("config.txt");
-        key = file.split("\n")[0].split(" ")[1];
-        console.log("http://" + address + ":5000/data/temperature/" + key);
+    function updateTemperature() {
         $.ajax({
             type: 'GET',
             url: "http://" + address + ":5000/data/temperature/" + key,
