@@ -53,7 +53,7 @@ var svg = d3.select("svg"),
     height = +svg.attr("height") - margin.top - margin.bottom;
     
 var points = d3.range(0, 10).map(function(i) {
-    return [i * width / 10, 50 + Math.random() * (height - 100)];
+    return [i * width / 10 - margin.left, 50 + Math.random() * (height - 100) - margin.top];
 });
 
 points = readRule();
@@ -230,7 +230,7 @@ function buildRule(d) {
     rule.data = [];
     for(p in d){
         // On the chart, hours are between [0, 1] and we need to rescale them between [0, 0.6]
-        rule.data.push({temperature : d[p][1], hour : rescale(d[p][0], 0.6)});
+        rule.data.push({temperature : d[p][1], hour : rescale(d[p][0], 1.0, 0.6)});
     }
     data[currentDay] = rule;
     sendRules(data);
@@ -239,9 +239,9 @@ function buildRule(d) {
 }
 
 //Rescale reals [0, 1] between [0, 0.6]
-function rescale(value, max_output){
+function rescale(value, max_input, max_output){
     troncValue = parseInt(value);
-    var res = (value - troncValue) * max_output
+    var res = (value - troncValue) * max_output / max_input
     return troncValue + res;
 }
 
@@ -255,21 +255,16 @@ function readRule() {
     currentDay = sect.options[sect.selectedIndex].value;
     loadPoints = data[currentDay].data;
     for(key in customPoints){
-        customPoints[key][0] = loadPoints[key].hour;
+        customPoints[key][0] = rescale(loadPoints[key].hour, 0.6, 1.0);
         customPoints[key][1] = loadPoints[key].temperature;
     }
     return customPoints;
 }
 
 function updateGraph(loadedPoints){
-    x = d3.scaleLinear()
-    .domain(d3.extent(points, function(d) { return d[0]; }))
-    .rangeRound([0, width]);
-
     y = d3.scaleLinear()
+    y.domain([0, 30])
     .rangeRound([height, 0]);
-
-    y.domain([0, 30]);
 
     var state = svg.selectAll("circle")
         .data(loadedPoints);
@@ -335,7 +330,6 @@ function sendRules(json) {
 }
 
 function getRules(callback) {
-    console.log(key)
     $.ajax({
         type: 'GET',
         url: "http://" + address + ":5000/data/planning/" + api_key,
@@ -384,7 +378,6 @@ function setWorking() {
     if(document.getElementById("power_button").innerHTML == "True"){
         work = false;
     }
-    console.log("Envoie " + work);
     $.ajax({
         type: 'PUT',
         url: "http://" + address + ":5000/manage/thermostat/" + api_key,
@@ -413,7 +406,6 @@ function getWorking() {
         type: 'GET',
         url: "http://" + address + ":5000/state/thermostat/" + api_key,
         success: function(data){
-            console.log(data);
             data = JSON.parse(data);
             if(data["status"] == "success")
                 document.getElementById("power_button").innerHTML = data["working"];
