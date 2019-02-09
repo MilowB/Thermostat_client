@@ -14,8 +14,7 @@
 <div class="row column">
 
 <h4 style="margin: 0;" class="text-center" id="request"></h4>
-<img id="up_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/up.svg" alt="augmentation de la température"/>
-<img id="down_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/down.svg" alt="diminution de la température"/>
+<img id="flame_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/flame.svg" alt="Le chauffage est en fonctionnement"/>
 
 </div>
 <body style="background-color: #C2C2C2;">
@@ -92,7 +91,6 @@
             type: 'GET',
             url: "http://" + address + ":5000/state/thermostat/" + key,
             success: function(data){
-                console.log(data);
                 data = JSON.parse(data);
                 if(data["status"] == "success")
                     document.getElementById("power_button").innerHTML = data["working"];
@@ -115,21 +113,19 @@
             type: 'GET',
             url: "http://" + address + ":5000/data/temperature/" + key,
             success: function(data){
+                console.log(data);
                 data = JSON.parse(data);
                 if(data["status"] == "success"){
                     var toPrint = "";
                     
                     toPrint = data["temperature"] + "°C";
                     if(lastTemperature != null){
-                        if(lastTemperature > data["temperature"]){
-                            document.getElementById("up_svg").style.display = "none";
-                            document.getElementById("down_svg").style.display = "block";
+                        if(data["heating"] == "True" ){
+                            document.getElementById("flame_svg").style.display = "block";
                         }
-                        else if(lastTemperature < data["temperature"]){
-                            document.getElementById("up_svg").style.display = "block";
-                            document.getElementById("down_svg").style.display = "none";
+                        else{
+                            document.getElementById("flame_svg").style.display = "none";
                         }
-                        else{}
                     }
                     document.getElementById("request").innerHTML = toPrint;
                     lastTemperature = data["temperature"];

@@ -14,7 +14,7 @@
     <svg width="1000" height="700"></svg>
 
     <select id="inds">
-        <option value="lundi" selected="selected">lundi</option>
+        <option value="lundi">lundi</option>
         <option value="mardi">mardi</option>
         <option value="mercredi">mercredi</option>
         <option value="jeudi">jeudi</option>
@@ -42,6 +42,10 @@
 
 <script>
 
+var ladate=new Date();
+var tab_jour=new Array("dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi");
+document.getElementById("inds").value = tab_jour[ladate.getDay()];
+
 file = readTextFile("config.txt");
 var address = file.split("\n")[1].split(" ")[1];
 var api_key = file.split("\n")[0].split(" ")[1];
@@ -63,7 +67,6 @@ ping(function(){
         updateGraph(points);
     });
 })
-
 
 svg.on("mousemove", updateLines);
 
