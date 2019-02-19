@@ -12,6 +12,8 @@
   </head>
     <body style="background-color: #C2C2C2;">
         <div class="row">
+            <img id="flame_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/flame.svg" alt="Le chauffage est en fonctionnement"/>
+            <h3  class="exterior" style="position: fixed; top: 5px; left: 5px;" id="request_exterior"></h3>
             <div class="columns medium-12">
                 <section id="temperature">
                     <div class="columns medium-4 modifiers">
@@ -23,7 +25,6 @@
                     <div class="columns medium-4 modifiers">
                         <img class="more" src="Images/more.png" alt="Ajouter 0.5C" />
                     </div>
-                    <img class="flame_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/flame.svg" alt="Le chauffage est en fonctionnement"/>
                 </section>
             </div>
         </div>
@@ -49,7 +50,7 @@
                 </div>
             </div>
         </footer>
-                            
+
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
         <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
         <script>
@@ -130,21 +131,20 @@
     function updateTemperature() {
         $.ajax({
             type: 'GET',
-            url: "http://" + address + ":5000/data/temperature/" + key,
+            url: "http://" + address + ":5000/data/all/" + key,
             success: function(data){
                 console.log(data);
                 data = JSON.parse(data);
                 if(data["status"] == "success"){
                     var toPrint = "";
                     toPrint = Math.round(data["temperature"] * 10) / 10 + "°C";
-                    if(lastTemperature != null){
-                        if(data["heating"] == "True" ){
-                            document.getElementById("flame_svg").style.display = "block";
-                        }
-                        else{
-                            document.getElementById("flame_svg").style.display = "none";
-                        }
+                    if(data["heating"] == "True" ){
+                        document.getElementById("flame_svg").style.display = "block";
                     }
+                    else{
+                        document.getElementById("flame_svg").style.display = "none";
+                    }
+                    document.getElementById("request_exterior").innerHTML = Math.round(data["exterior"] * 10) / 10 + "°C";
                     document.getElementById("request").innerHTML = toPrint;
                     lastTemperature = data["temperature"];
                 }
