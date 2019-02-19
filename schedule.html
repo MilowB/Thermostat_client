@@ -47,7 +47,7 @@ var tab_jour=new Array("dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendr
 document.getElementById("inds").value = tab_jour[ladate.getDay()];
 
 file = readTextFile("config.txt");
-var hardware = file.split("\n")[2].split(" ")[1];
+var cursor = file.split("\n")[2].split(" ")[1];
 var address = file.split("\n")[1].split(" ")[1];
 var api_key = file.split("\n")[0].split(" ")[1];
 

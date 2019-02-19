@@ -6,51 +6,62 @@
     
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
     <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
-
+    <link rel="stylesheet" type="text/css" href="css/style.css">.
     <meta charset="UTF-8">
     <title>Main Page</title>
   </head>
-
-<div class="row column">
-
-<h4 style="margin: 0;" class="text-center" id="request"></h4>
-<img id="flame_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/flame.svg" alt="Le chauffage est en fonctionnement"/>
-
-</div>
-<body style="background-color: #C2C2C2;">
-    <div class="columns large-12">
-        <button type="button" class="button large" onclick="updateTemperature()">Mettre à jour la température</button>
-    </div>
-
-    <div class="columns large-12">
-        <div class="columns large-3" style="background-color: #2C2C2C;">
-            <a href="index.html">Temperature</a>
+    <body style="background-color: #C2C2C2;">
+        <div class="row">
+            <div class="columns medium-12">
+                <section id="temperature">
+                    <div class="columns medium-4 modifiers">
+                        <img class="less" src="Images/less.png" alt="Diminuer 0.5C" />
+                    </div>
+                    <div class="columns medium-4 modifiers">
+                        <h1  class="tempe_text" id="request"></h1>
+                    </div>
+                    <div class="columns medium-4 modifiers">
+                        <img class="more" src="Images/more.png" alt="Ajouter 0.5C" />
+                    </div>
+                    <img class="flame_svg" style="display: none; position: fixed; top: 5px; right: 5px;" src="Images/flame.svg" alt="Le chauffage est en fonctionnement"/>
+                </section>
+            </div>
         </div>
-        <div class="columns large-3" style="background-color: #2C2C2C;">
-            <a href="historic.html">Historique</a>
-        </div>
-        <div class="columns large-3" style="background-color: #2C2C2C;">
-            <a href="schedule.html">Planning</a>
-        </div>
-        <div class="columns large-3" style="background-color: #2C2C2C;">
-            <a onclick="setWorking()" id="power_button" >Power</a>
-        </div>
-    </div>
 
-
-</footer>
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
-<script>
-      $(document).foundation();
-	</script>
-</body>
+        <footer>
+            <div class="medium-12 medium-centered columns">
+                <div class="columns medium-12">
+                    <button type="button" class="button large" onclick="updateTemperature()">Mettre à jour la température</button>
+                </div>
+                <div class="columns medium-12">
+                    <div class="columns medium-3" style="background-color: #2C2C2C;">
+                        <a href="index.html">Temperature</a>
+                    </div>
+                    <div class="columns medium-3" style="background-color: #2C2C2C;">
+                        <a href="historic.html">Historique</a>
+                    </div>
+                    <div class="columns medium-3" style="background-color: #2C2C2C;">
+                        <a href="schedule.html">Planning</a>
+                    </div>
+                    <div class="columns medium-3" style="background-color: #2C2C2C;">
+                        <a onclick="setWorking()" id="power_button" >Power</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+                            
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+        <script>
+        $(document).foundation();
+        </script>
+    </body>
 </html>
 
 <script>
     var lastTemperature = null;
     var file = readTextFile("config.txt");
-    var hardware = file.split("\n")[2].split(" ")[1];
+    var cursor = file.split("\n")[2].split(" ")[1];
     var address = file.split("\n")[1].split(" ")[1];
     var key = file.split("\n")[0].split(" ")[1];
 
@@ -125,8 +136,7 @@
                 data = JSON.parse(data);
                 if(data["status"] == "success"){
                     var toPrint = "";
-                    
-                    toPrint = data["temperature"] + "°C";
+                    toPrint = Math.round(data["temperature"] * 10) / 10 + "°C";
                     if(lastTemperature != null){
                         if(data["heating"] == "True" ){
                             document.getElementById("flame_svg").style.display = "block";
