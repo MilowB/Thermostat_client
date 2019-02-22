@@ -17,13 +17,14 @@
             <div class="columns medium-12">
                 <section id="temperature">
                     <div class="columns medium-4 modifiers">
-                        <img class="less" src="Images/less.png" alt="Diminuer 0.5C" />
+                        <img class="less" src="Images/less.png" onclick="sendModifier(-0.5)" alt="Diminuer 0.5C" />
                     </div>
                     <div class="columns medium-4 modifiers">
                         <h1  class="tempe_text" id="request"></h1>
+                        <h3  class="modifier_text" id="request_modifier"></h3>
                     </div>
                     <div class="columns medium-4 modifiers">
-                        <img class="more" src="Images/more.png" alt="Ajouter 0.5C" />
+                        <img class="more" src="Images/more.png" onclick="sendModifier(0.5)" alt="Ajouter 0.5C" />
                     </div>
                 </section>
             </div>
@@ -101,6 +102,27 @@
             error: function(jqXHR, textStatus, errorThrown) {
                 if(jqXHR.status == 0){
                     document.getElementById("power_button").innerHTML = "Serveur indisponible";
+                }
+            }
+        });
+    }
+
+    function sendModifier(value) {
+        $.ajax({
+            type: 'PUT',
+            url: "http://" + address + ":5000/manage/setModifier/" + key,
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({"value": value}),
+            success: function(data){
+                data = JSON.parse(data);
+                if(data["status"] == "success"){
+                    document.getElementById("request_modifier").innerHTML = data["modifier"];
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if(jqXHR.status == 0){
+                    document.getElementById("modifier").innerHTML = "";
                 }
             }
         });
