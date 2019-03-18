@@ -159,7 +159,7 @@
                 data = JSON.parse(data);
                 if(data["status"] == "success"){
                     var toPrint = "";
-                    toPrint = Math.round(data["temperature"] * 10) / 10 + "°C";
+                    toPrint = Math.round(data["temperature"] * 10) / 10 + "°C" + " / " + Math.round(data["required"] * 10) / 10 + "°C";
                     if(data["heating"] == "True" ){
                         document.getElementById("flame_svg").style.display = "block";
                     }
@@ -169,6 +169,7 @@
                     document.getElementById("request_exterior").innerHTML = Math.round(data["exterior"] * 10) / 10 + "°C";
                     document.getElementById("request").innerHTML = toPrint;
                     lastTemperature = data["temperature"];
+                    document.getElementById("request_modifier").innerHTML = data["modifier"];
                 }
                 else
                     document.getElementById("request").innerHTML = data["description"];
