@@ -169,7 +169,7 @@
                     document.getElementById("request_exterior").innerHTML = Math.round(data["exterior"] * 10) / 10 + "°C";
                     document.getElementById("request").innerHTML = toPrint;
                     lastTemperature = data["temperature"];
-                    document.getElementById("request_modifier").innerHTML = data["modifier"];
+                    document.getElementById("request_modifier").innerHTML = Math.round(data["modifier"] * 10) / 10;
                 }
                 else
                     document.getElementById("request").innerHTML = data["description"];
@@ -200,59 +200,3 @@
     return allText;
   }
 </script>
-
-<!--
-  <body>
-    <h1>Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-
-    <h1>The XMLHttpRequest Object</h1>
-
-    <button type="button" onclick="loadDoc()">Request data</button>
-
-    <p id="request"></p>
-    <script>
-            // Feel free to change or delete any of the code you see in this editor!
-            var svg = d3.select("body").append("svg")
-              .attr("width", 960)
-              .attr("height", 500)
-        
-            svg.append("text")
-              .text("Edit the code below to change me!")
-              .attr("y", 200)
-              .attr("x", 120)
-              .attr("font-size", 36)
-              .attr("font-family", "monospace")
-        
-          </script>
-    <script>
-      function loadDoc() {
-        key = readTextFile("config.txt");
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          document.getElementById("request").innerHTML = this.responseText;
-        };
-        xhttp.open("GET", "http://localhost:5000/data/temperature/" + key, true);
-        xhttp.send();
-      }
-
-      function readTextFile(file) {
-        var allText = "";
-        var rawFile = new XMLHttpRequest();
-        rawFile.open("GET", file, false);
-        rawFile.onreadystatechange = function () {
-            if(rawFile.readyState === 4) {
-                if(rawFile.status === 200 || rawFile.status == 0) {
-                    allText = rawFile.responseText;
-                }
-            }
-        }
-        rawFile.send(null);
-        return allText;
-      }
-      </script>
-  </body>
-    </html>
--->
