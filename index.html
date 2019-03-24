@@ -117,7 +117,7 @@
             success: function(data){
                 data = JSON.parse(data);
                 if(data["status"] == "success"){
-                    document.getElementById("request_modifier").innerHTML = data["modifier"];
+                    document.getElementById("request_modifier").innerHTML = Math.round(data["modifier"] * 10) / 10;
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
