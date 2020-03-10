@@ -83,7 +83,7 @@
         if(document.getElementById("power_button").innerHTML == "True"){
             work = false;
         }
-        console.log("Envoie " + work);
+        console.log("Envoie " + work); //@debug
         $.ajax({
             type: 'PUT',
             url: "http://" + address + ":5000/manage/thermostat/" + key,
@@ -143,9 +143,6 @@
                 if(jqXHR.status == 0){
                     document.getElementById("power_button").innerHTML = "Serveur indisponible";
                 }
-                //alert(jqXHR.status);
-                //alert(textStatus);
-                //alert(errorThrown);
             }
         });
     }
@@ -168,6 +165,7 @@
                     }
                     document.getElementById("request_exterior").innerHTML = Math.round(data["exterior"] * 10) / 10 + "°C";
                     document.getElementById("request").innerHTML = toPrint;
+                    document.getElementById("power_button").innerHTML = data["working"];
                     lastTemperature = data["temperature"];
                     document.getElementById("request_modifier").innerHTML = Math.round(data["modifier"] * 10) / 10;
                 }
@@ -178,9 +176,6 @@
                 if(jqXHR.status == 0){
                     document.getElementById("request").innerHTML = "Serveur indisponible";
                 }
-                //alert(jqXHR.status);
-                //alert(textStatus);
-                //alert(errorThrown);
             }
         });
     }
